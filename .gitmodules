@@ -1,0 +1,15 @@
+[submodule "TUI"]
+	path = TUI
+	url = git@github.com:Neptune-Knights/TUI.git
+[submodule "ArduinoLeakSensor"]
+	path = ArduinoLeakSensor
+	url = git@github.com:Neptune-Knights/ArduinoLeakSensor.git
+[submodule "BlueOS"]
+	path = BlueOS
+	url = git@github.com:Neptune-Knights/BlueOS.git
+[submodule "Neptune-Knights-2025-Documentation"]
+	path = Neptune-Knights-2025-Documentation
+	url = git@github.com:Neptune-Knights/Neptune-Knights-2025-Documentation.git
+[submodule "ardupilot"]
+	path = ardupilot
+	url = git@github.com:Neptune-Knights/ardupilot.git
