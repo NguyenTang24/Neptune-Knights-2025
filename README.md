@@ -14,7 +14,10 @@ The control station runs the latest version of Ubuntu 24.10. The BlueOS control 
 
 
 # Installation
+## For Development:
 This will install all of the code in a GIT workspace on your computer. Only install everything if you will be working on development across the team. Otherwise, you only need to install relevant repostories.
+
+Find instructions on adding an ssh key [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
 
 ```bash
 mkdir "Neptune Knights 2025"
@@ -25,8 +28,19 @@ cd src
 git submodule update --init --recursive
 ```
 
-## BlueOS and Ardupilot:
-## Cameras:
+## Control Station:
+[Camera Stream Viewr](https://github.com/Neptune-Knights/Neptune-Knights-2025/tree/main/stream%20viewer)
+BlueOS can be accessed in the web browser at the ROV's IP address, 192.168.0.100. No installation is needed on the control station.
+
+[Hugin](https://hugin.sourceforge.io/) will be used for the photosphere task.
+```bash
+sudo apt install flatpak
+flatpak install flathub net.sourceforge.Hugin
+```
+
+
+## ROV Software (BlueOS and Ardupilotx):
+### [Cameras](https://github.com/Neptune-Knights/Neptune-Knights-2025/tree/main/ustreamer%20launch):
 This installs a service on the Pi to launch an http stream of the cameras. It is currently set up for only one camera stream.
 On the Pi:
 ```bash
@@ -35,7 +49,10 @@ cd ustreamer-service
 chmod +x ustreamer.service
 ./install.sh
 ```
-
+** [BlueOS Installation](https://github.com/bluerobotics/BlueOS/tree/master/install) **
+```bash
+sudo su -c 'curl -fsSL https://raw.githubusercontent.com/bluerobotics/BlueOS/master/install/install.sh | bash'
+```
 
 ## Float:
 
