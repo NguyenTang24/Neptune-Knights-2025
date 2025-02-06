@@ -11,8 +11,8 @@ This script automates the setup of **persistent camera names** and ensures `uStr
 
 Run the following commands on your Raspberry Pi:  
 ```bash
-git clone https://github.com/yourusername/your-repo.git
-cd your-repo
+git clone https://github.com/Neptune-Knights/Neptune-Knights-2025/tree/main/ustreamer%20launch
+cd "ustreamer launch" 
 chmod +x install.sh
 ./install.sh
 ```
@@ -25,8 +25,8 @@ Enter a custom name for this camera (e.g., 'cam_front', 'cam_rear'): cam_front
 
 # How to Acces Camera Streams:
 After installation, they will be available at:
-- http://<pi-ip>:8080 -> /dev/cam_front
-- http://<pi-ip>:8081 -> /dev/cam_rear (etc.)
+- http://pi-ip:8080 -> /dev/cam_front
+- http://pi-ip:8081 -> /dev/cam_rear (etc.)
 
 # Managing Camera Streams:
 ## Check Running Services:
@@ -44,7 +44,7 @@ sudo systemctl stop ustreamer_cam_rear
 Disable a Camera from AutoStarting:
 ```bash
 sudo systemctl disable ustreamer_cam_side
-bash
+```
 
 # Uninstalling & Removing Persistent Names:
 If you want to remove the uStreamer service and persistent camera names, run:
@@ -56,9 +56,5 @@ sudo rm /etc/udev/rules.d/99-usb-cameras.rules
 sudo systemctl daemon-reload
 sudo udevadm control --reload-rules
 sudo udevadm trigger
-```
-A
-A
-A
 ```
 
