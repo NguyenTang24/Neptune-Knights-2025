@@ -29,12 +29,12 @@ git submodule update --init --recursive
 ## Cameras:
 This installs a service on the Pi to launch an http stream of the cameras. It is currently set up for only one camera stream.
 On the Pi:
-'''bash
+```bash
 git clone https://github.com/Neptune-Knights/Neptune-Knights-2025/ustreamer-service
 cd ustreamer-service
 chmod +x ustreamer.service
 ./install.sh
-'''
+```
 
 
 ## Float:
