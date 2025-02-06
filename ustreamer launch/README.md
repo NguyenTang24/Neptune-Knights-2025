@@ -1,15 +1,64 @@
-# About
-The camera control software uses the [ustreamer](https://github.com/pikvm/ustreamer) package for streaming. This script installs ustreamer and sets up a systemd service to launch the streams on startup.
+# uStreamer Auto-Start with Persistent Camera Naming  
 
-Currently, the stream from device /dev/video0 is launched on 192.168.0.100:8080. The stream can be accessed at http://192.168.0.100:8080/stream and a snapshot at http://192.168.0.100:8080/snapshot. 
+This script automates the setup of **persistent camera names** and ensures `uStreamer` starts automatically on boot.  
+✅ Automatically detects cameras and assigns them permanent names
+✅ Ensures consistent camera mapping across reboots
+✅ Streams each camera on a unique port
+✅ Auto-restarts streams if they fail
+✅ Works for any number of cameras
 
-# Installation
-On the Pi:
+## Installation  
+
+Run the following commands on your Raspberry Pi:  
 ```bash
-git clone https://github.com/Neptune-Knights/Neptune-Knights-2025/usteamer-service
-cd ustreamer-service
+git clone https://github.com/yourusername/your-repo.git
+cd your-repo
 chmod +x install.sh
 ./install.sh
 ```
 
+During setup, you will be asked to name each camera. For example:
+```bash
+Detected camera: /dev/video0
+Enter a custom name for this camera (e.g., 'cam_front', 'cam_rear'): cam_front
+```
+
+# How to Acces Camera Streams:
+After installation, they will be available at:
+- http://<pi-ip>:8080 -> /dev/cam_front
+- http://<pi-ip>:8081 -> /dev/cam_rear (etc.)
+
+# Managing Camera Streams:
+## Check Running Services:
+```bash
+systemctl list-units --type=service | grep ustreamer
+```
+Restart a Camera Stream:
+```bash
+sudo systemctl restart ustreamer_cam_front
+```
+Stop a Camera Stream:
+```bash
+sudo systemctl stop ustreamer_cam_rear
+```
+Disable a Camera from AutoStarting:
+```bash
+sudo systemctl disable ustreamer_cam_side
+bash
+
+# Uninstalling & Removing Persistent Names:
+If you want to remove the uStreamer service and persistent camera names, run:
+```bash
+sudo systemctl stop ustreamer_*
+sudo systemctl disable ustreamer_*
+sudo rm /etc/systemd/system/ustreamer_*.service
+sudo rm /etc/udev/rules.d/99-usb-cameras.rules
+sudo systemctl daemon-reload
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+A
+A
+A
+```
 

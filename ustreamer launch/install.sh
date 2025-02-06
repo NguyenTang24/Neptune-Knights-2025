@@ -1,18 +1,74 @@
 #!/bin/bash
 
-echo "Installing ustreamer and setting up uStreamer service..."
+# Get the current username
+USER=$(whoami)
 
+echo "Installing uStreamer and setting up persistent camera names..."
+
+# Update package list and install ustreamer
 sudo apt update
-sudo apt install -y ustreamer 
+sudo apt install -y ustreamer
 
-# Move the service file
-sudo mv ustreamer.service /etc/systemd/system/
+# Create a udev rules file
+UDEV_RULES_FILE="/etc/udev/rules.d/99-usb-cameras.rules"
+echo "# Persistent USB camera names" | sudo tee "$UDEV_RULES_FILE" > /dev/null
 
-# Reload systemd
+# Reload systemd to recognize new services
 sudo systemctl daemon-reload
 
-# Enable and start the service
-sudo systemctl enable ustreamer
-sudo systemctl start ustreamer
+# Counter for assigning ports dynamically
+PORT=8080
 
-echo "Installation complete. uStreamer is now running."
+# Detect connected cameras
+for device in /dev/video*; do
+    if [[ -e "$device" ]]; then
+        echo "Detected camera: $device"
+        
+        # Get camera details
+        DEVICE_PATH=$(udevadm info -q path -n "$device")
+        ID_VENDOR=$(udevadm info -a -p "$DEVICE_PATH" | grep 'ATTRS{idVendor}' | head -n 1 | awk -F'==' '{print $2}' | tr -d '"')
+        ID_PRODUCT=$(udevadm info -a -p "$DEVICE_PATH" | grep 'ATTRS{idProduct}' | head -n 1 | awk -F'==' '{print $2}' | tr -d '"')
+
+        # Ask the user to name the camera
+        echo -n "Enter a custom name for this camera (e.g., 'cam_front', 'cam_rear'): "
+        read CAM_NAME
+
+        # Write the udev rule
+        echo "SUBSYSTEM==\"video4linux\", ATTRS{idVendor}==\"$ID_VENDOR\", ATTRS{idProduct}==\"$ID_PRODUCT\", SYMLINK+=\"$CAM_NAME\"" | sudo tee -a "$UDEV_RULES_FILE" > /dev/null
+
+        # Create and enable systemd service for this camera
+        SERVICE_FILE="/etc/systemd/system/ustreamer_$CAM_NAME.service"
+        echo "[Unit]
+Description=uStreamer Service for $CAM_NAME
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/bin/bash -c 'ustreamer --device=/dev/$CAM_NAME --host=\$(hostname -I | awk \"{print \$1}\") --port=$PORT'
+Restart=always
+User=$USER
+WorkingDirectory=/home/$USER
+StandardOutput=append:/var/log/ustreamer_$CAM_NAME.log
+StandardError=append:/var/log/ustreamer_$CAM_NAME.log
+
+[Install]
+WantedBy=multi-user.target" | sudo tee "$SERVICE_FILE" > /dev/null
+
+        # Enable and start the service
+        sudo systemctl enable "ustreamer_$CAM_NAME"
+        sudo systemctl start "ustreamer_$CAM_NAME"
+
+        echo "Camera '$CAM_NAME' is now streaming on port $PORT"
+
+        # Increment port for the next camera
+        PORT=$((PORT + 1))
+    fi
+done
+
+# Apply udev rules
+echo "Reloading udev rules..."
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
+echo "Installation complete! Your cameras now have persistent names and auto-start on boot."
+
