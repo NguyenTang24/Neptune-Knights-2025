@@ -1,51 +1,55 @@
 #!/bin/bash
 
-# Get the current username
+# Ensure necessary packages are installed
+sudo apt update
+sudo apt install -y v4l-utils ustreamer
+
+# Get current user
 USER=$(whoami)
 
-echo "Installing uStreamer and setting up persistent camera names..."
+echo "Detecting USB cameras..."
 
-# Update package list and install ustreamer
-sudo apt update
-sudo apt install -y ustreamer
+# Find only USB-connected cameras
+USB_CAMERAS=()
+for device in /dev/video*; do
+    if udevadm info -q property -n "$device" | grep -q "ID_BUS=usb"; then
+        USB_CAMERAS+=("$device")
+    fi
+done
+
+if [ ${#USB_CAMERAS[@]} -eq 0 ]; then
+    echo "❌ No USB cameras detected! Make sure your camera is plugged in."
+    exit 1
+fi
+
+echo "Found ${#USB_CAMERAS[@]} USB camera(s)."
 
 # Create a udev rules file
 UDEV_RULES_FILE="/etc/udev/rules.d/99-usb-cameras.rules"
 echo "# Persistent USB camera names" | sudo tee "$UDEV_RULES_FILE" > /dev/null
 
-# Reload systemd to recognize new services
-sudo systemctl daemon-reload
+# Counter for ports
+PORT=8080
 
-# Counter for assigning ports dynamically
-PORT=8082
-CAMERAS=($(ls /devvideo* 2>/dev/null))
+for device in "${USB_CAMERAS[@]}"; do
+    echo "🔍 Detected USB camera: $device"
 
-if [ ${#CAMERAS[@]} -eq 0 ]; then
-    echo "no cameras detected. Exiting."
-    exit 1
-fi
+    # Get device details
+    DEVICE_PATH=$(udevadm info -q path -n "$device")
+    ID_VENDOR=$(udevadm info -a -p "$DEVICE_PATH" | grep 'ATTRS{idVendor}' | head -n 1 | awk -F'==' '{print $2}' | tr -d '"')
+    ID_PRODUCT=$(udevadm info -a -p "$DEVICE_PATH" | grep 'ATTRS{idProduct}' | head -n 1 | awk -F'==' '{print $2}' | tr -d '"')
 
+    # Ask the user to name the camera
+    echo -n "Enter a name for this camera (e.g., cam_front, cam_rear): "
+    read CAM_NAME
 
-# Detect connected cameras
-for device in "${#CAMERAS[@]}"; do
-        echo "Detected camera: $device"
-        
-        # Get camera details
-        DEVICE_PATH=$(udevadm info -q path -n "$device")
-        ID_VENDOR=$(udevadm info -a -p "$DEVICE_PATH" | grep 'ATTRS{idVendor}' | head -n 1 | awk -F'==' '{print $2}' | tr -d '"')
-        ID_PRODUCT=$(udevadm info -a -p "$DEVICE_PATH" | grep 'ATTRS{idProduct}' | head -n 1 | awk -F'==' '{print $2}' | tr -d '"')
+    # Write the udev rule
+    echo "SUBSYSTEM==\"video4linux\", ATTRS{idVendor}==\"$ID_VENDOR\", ATTRS{idProduct}==\"$ID_PRODUCT\", SYMLINK+=\"$CAM_NAME\"" | sudo tee -a "$UDEV_RULES_FILE" > /dev/null
 
-        # Ask the user to name the camera
-        echo -n "Enter a custom name for this camera (e.g., 'cam_front', 'cam_rear'): "
-        read CAM_NAME
-
-        # Write the udev rule
-        echo "SUBSYSTEM==\"video4linux\", ATTRS{idVendor}==\"$ID_VENDOR\", ATTRS{idProduct}==\"$ID_PRODUCT\", SYMLINK+=\"$CAM_NAME\"" | sudo tee -a "$UDEV_RULES_FILE" > /dev/null
-
-        # Create and enable systemd service for this camera
-        SERVICE_FILE="/etc/systemd/system/ustreamer_$CAM_NAME.service"
-        echo "[Unit]
-Description=uStreamer Service for $CAM_NAME
+    # Create a systemd service for the camera
+    SERVICE_FILE="/etc/systemd/system/ustreamer_$CAM_NAME.service"
+    echo "[Unit]
+Description=uStreamer for $CAM_NAME
 After=network-online.target
 Wants=network-online.target
 
@@ -60,20 +64,20 @@ StandardError=append:/var/log/ustreamer_$CAM_NAME.log
 [Install]
 WantedBy=multi-user.target" | sudo tee "$SERVICE_FILE" > /dev/null
 
-        # Enable and start the service
-        sudo systemctl enable "ustreamer_$CAM_NAME"
-        sudo systemctl start "ustreamer_$CAM_NAME"
+    # Enable and start the service
+    sudo systemctl enable "ustreamer_$CAM_NAME"
+    sudo systemctl start "ustreamer_$CAM_NAME"
 
-        echo "Camera '$CAM_NAME' is now streaming on port $PORT"
+    echo "✅ Camera '$CAM_NAME' is streaming on port $PORT"
 
-        # Increment port for the next camera
-        PORT=$((PORT + 1))
+    # Increment port for the next camera
+    PORT=$((PORT + 1))
 done
 
 # Apply udev rules
-echo "Reloading udev rules..."
+echo "♻️ Reloading udev rules..."
 sudo udevadm control --reload-rules
 sudo udevadm trigger
 
-echo "Installation complete! Your cameras now have persistent names and auto-start on boot."
+echo "🎉 Setup complete! Your USB cameras now have persistent names and start automatically."
 
