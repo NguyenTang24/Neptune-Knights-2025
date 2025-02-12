@@ -11,8 +11,8 @@ This script automates the setup of **persistent camera names** and ensures `uStr
 
 Run the following commands on your Raspberry Pi:  
 ```bash
-git clone https://github.com/Neptune-Knights/Neptune-Knights-2025/tree/main/ustreamer%20launch
-cd "ustreamer launch" 
+git clone https://github.com/Neptune-Knights/Neptune-Knights-2025
+cd "Neptune-Knights-2025/ustreamer launch" 
 chmod +x install.sh
 ./install.sh
 ```
