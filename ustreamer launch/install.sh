@@ -29,7 +29,7 @@ UDEV_RULES_FILE="/etc/udev/rules.d/99-usb-cameras.rules"
 echo "# Persistent USB camera names" | sudo tee "$UDEV_RULES_FILE" > /dev/null
 
 # Counter for ports
-PORT=8080
+PORT=8082
 
 for device in "${USB_CAMERAS[@]}"; do
     echo "🔍 Detected USB camera: $device"
