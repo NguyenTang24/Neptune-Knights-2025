@@ -17,11 +17,17 @@ echo "# Persistent USB camera names" | sudo tee "$UDEV_RULES_FILE" > /dev/null
 sudo systemctl daemon-reload
 
 # Counter for assigning ports dynamically
-PORT=8080
+PORT=8082
+CAMERAS=($(ls /devvideo* 2>/dev/null))
+
+if [ ${#CAMERAS[@]} -eq 0 ]; then
+    echo "no cameras detected. Exiting."
+    exit 1
+fi
+
 
 # Detect connected cameras
-for device in /dev/video*; do
-    if [[ -e "$device" ]]; then
+for device in "${#CAMERAS[@]}"; do
         echo "Detected camera: $device"
         
         # Get camera details
@@ -62,7 +68,6 @@ WantedBy=multi-user.target" | sudo tee "$SERVICE_FILE" > /dev/null
 
         # Increment port for the next camera
         PORT=$((PORT + 1))
-    fi
 done
 
 # Apply udev rules
