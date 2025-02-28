@@ -67,8 +67,8 @@ Integration with the Camera Stream Viewer is coming.
 Currently, the network is centered around a router in the control station. Any router that allows for custom IP mapping is sufficient. 
 For our team, the following static IPs are used:
 - Router: 192.168.0.1
-- Control Station: 192.168.0.101
-- ROV (Raspberry Pi): 192.168.0.100
+- Control Station (hostname neptune): 192.168.0.101
+- ROV (Raspberry Pi (hostname blueos)): 192.168.0.100
 
 
 ## Float:

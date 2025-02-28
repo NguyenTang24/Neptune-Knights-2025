@@ -1,6 +1,3 @@
-[submodule "TUI"]
-	path = TUI
-	url = git@github.com:Neptune-Knights/TUI.git
 [submodule "ArduinoLeakSensor"]
 	path = ArduinoLeakSensor
 	url = git@github.com:Neptune-Knights/ArduinoLeakSensor.git
