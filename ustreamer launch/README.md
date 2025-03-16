@@ -23,6 +23,7 @@ sudo cp 99-usb-cameras.rules /etc/udev/rules.d/
 ```
 
 ### 4. Apply the udev Rules
+The udev rules are based on the physical port number. It is important that the cameras remain plugged into the same USB port.
 ```bash
 sudo udevadm control --reload-rules
 sudo udevadm trigger
@@ -66,6 +67,12 @@ journalctl -u ustreamer -f
   ```bash
   sudo systemctl restart ustreamer
   ```
+
+## Updating udev rules:
+How to find port number of each camera:
+```bash
+udevadm info -a -n /dev/video0 | grep KERNELS
+```
 
 ## Uninstalling
 To remove the setup:

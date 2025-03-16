@@ -1,14 +1,5 @@
-# Persistent USB Camera Names
-
-# Front Camera
-SUBSYSTEM=="video4linux", ATTRS{idVendor}=="XXXX", ATTRS{idProduct}=="YYYY", SYMLINK+="frontcam"
-
-# Left Camera
-SUBSYSTEM=="video4linux", ATTRS{idVendor}=="XXXX", ATTRS{idProduct}=="YYYY", SYMLINK+="leftcam"
-
-# Right Camera
-SUBSYSTEM=="video4linux", ATTRS{idVendor}=="XXXX", ATTRS{idProduct}=="YYYY", SYMLINK+="rightcam"
-
-# Tether Camera
-SUBSYSTEM=="video4linux", ATTRS{idVendor}=="XXXX", ATTRS{idProduct}=="YYYY", SYMLINK+="tethercam"
+SUBSYSTEM=="video4linux", KERNELS=="1-2", SYMLINK+="frontcam"
+SUBSYSTEM=="video4linux", KERNELS=="3-2", SYMLINK+="leftcam"
+SUBSYSTEM=="video4linux", KERNELS=="1-1.5", SYMLINK+="rightcam"
+SUBSYSTEM=="video4linux", KERNELS=="1-1.6", SYMLINK+="tethercam"
 
