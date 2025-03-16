@@ -1,0 +1,80 @@
+# uStreamer Multi-Camera Setup
+
+## Overview
+This setup enables persistent USB camera names using `udev` rules and launches multiple `ustreamer` instances automatically on startup.
+
+## Installation
+### 1. Clone the Repository
+```bash
+git clone <your-repo-url>
+cd <your-repo-name>
+```
+
+### 2. Install Dependencies
+```bash
+sudo apt update
+sudo apt install -y v4l-utils ustreamer
+```
+
+### 3. Move the udev Rules File
+Move the provided udev rules file into the correct directory:
+```bash
+sudo cp 99-usb-cameras.rules /etc/udev/rules.d/
+```
+
+### 4. Apply the udev Rules
+```bash
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+
+### 5. Move ustreamer.service into systemd
+```bash
+sudo cp ustreamer.service /etc/systemd/system/
+```
+
+### 6. Enable and Start the uStreamer Service
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable ustreamer
+sudo systemctl start ustreamer
+```
+
+## Viewing the Streams
+Once the service is running, access your camera streams at:
+- `http://<Pi_IP>:8082` (Front Camera)
+- `http://<Pi_IP>:8083` (Left Camera)
+- `http://<Pi_IP>:8084` (Right Camera)
+- `http://<Pi_IP>:8085` (Tether Camera)
+
+## Checking Logs
+To check if the service is running correctly, use:
+```bash
+journalctl -u ustreamer -f
+```
+
+## Troubleshooting
+- If a camera is not appearing at `/dev/frontcam`, `/dev/leftcam`, etc., check with:
+  ```bash
+  ls -l /dev/frontcam
+  ```
+- Verify that the udev rules are correct:
+  ```bash
+  udevadm info -q property -n /dev/videoX
+  ```
+- Restart the service:
+  ```bash
+  sudo systemctl restart ustreamer
+  ```
+
+## Uninstalling
+To remove the setup:
+```bash
+sudo systemctl stop ustreamer
+sudo systemctl disable ustreamer
+sudo rm /etc/systemd/system/ustreamer.service
+sudo rm /etc/udev/rules.d/99-usb-cameras.rules
+sudo udevadm control --reload-rules
+```
+
+
