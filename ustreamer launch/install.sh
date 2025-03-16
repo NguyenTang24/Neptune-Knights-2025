@@ -12,10 +12,8 @@ echo "Detecting USB cameras..."
 # Find only USB-connected cameras
 USB_CAMERAS=()
 for device in /dev/video*; do
-    if v4l2-ctl -d "$device" -D | grep -q "Video Capture"; then
-        if udevadm info -q property -n "$device" | grep -q "ID_BUS=usb"; then
-            USB_CAMERAS+=("$device")
-        fi
+    if udevadm info -q property -n "$device" | grep -q "ID_BUS=usb"; then
+        USB_CAMERAS+=("$device")
     fi
 done
 
