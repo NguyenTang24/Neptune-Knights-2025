@@ -1,0 +1,16 @@
+[Unit]
+Description=uStreamer Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/bin/bash -c 'ustreamer --host=$(hostname -I | awk "{print $1}") --port=8080'
+Restart=always
+User=%i
+WorkingDirectory=/home/%i
+StandardOutput=append:/var/log/ustreamer.log
+StandardError=append:/var/log/ustreamer.log
+
+[Install]
+WantedBy=multi-user.target
+
