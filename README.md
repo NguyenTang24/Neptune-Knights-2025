@@ -29,6 +29,12 @@ cd src
 git submodule update --init --recursive
 ```
 
+It is also recommended that you copy the contents of INFO/.bashrc into your .bashrc file or source the file.
+Also, copy the contents of INFO/hosts into your /etc/hosts file:
+```bash
+sudo cat INFO/hosts >> /etc/hosts
+```
+
 ## ROV Software (BlueOS, ArduPilot, and scripts):
 
 BlueOS is the companion software to ArduPilot. It runs on the Raspberry Pi and can be accessed via the web browser on the control station on the same network. See below for how to install ArduPilot onto the flight controller from within BlueOS. 
