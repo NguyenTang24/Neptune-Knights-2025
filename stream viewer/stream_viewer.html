@@ -7,83 +7,131 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f1f1f1;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+        }
+        .dropdown {
+            position: relative;
+            margin-right: 20px;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+            min-width: 150px;
+            z-index: 1;
+            top: 100%;
+            padding: 10px;
+        }
+        .dropdown-content label {
+            display: block;
+            margin: 5px 0;
+        }
+        .dropdown-content input {
+            margin-right: 10px;
         }
         .stream-container {
-            width: 80%;
-            margin: 20px auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 60px 10px 10px;
         }
         video {
-            width: 100%;
-            max-width: 800px;
+            max-width: 48%;
             height: auto;
-        }
-        .controls {
-            margin-top: 20px;
         }
     </style>
 </head>
+</h1> Camera Viewer</h1>
 <body>
     <h1>Camera Stream Viewer</h1>
-    <div class="stream-container">
-        <video id="videoStream" controls autoplay>
-            <source src="http://192.168.0.100:8080/stream" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+    <div class="header">
+        <div class="dropdown">
+            <button onclick="toggleCameraDropdown()">Select Cameras</button>
+            <div id="cameraDropdownMenu" class="dropdown-content">
+                <label>
+                    <input type="checkbox" id="camera1" value="0" onchange="updateCameras()">
+                    Camera 1
+                </label>
+                <label>
+                    <input type="checkbox" id="camera2" value="1" onchange="updateCameras()">
+                    Camera 2
+                </label>
+                <label>
+                    <input type="checkbox" id="camera3" value="2" onchange="updateCameras()">
+                    Camera 3
+                </label>
+                <label>
+                    <input type="checkbox" id="camera4" value="3" onchange="updateCameras()">
+                    Camera 4
+                </label>
+            </div>
+        </div>
     </div>
-    <div class="Menu">
-        <button onclick="CameraCount(0)">One Camera</button>
-        <button onclick="CameraCount(1)">Two Camera</button>
-        <button onclick="CameraCount(2)">Three Camera</button>
-        <button onclick="CameraCount(3)">Four Camera</button>
+
+    <div class="stream-container" id="streamContainer">
+        <!-- Cameras will be dynamically added here -->
     </div>
-        <div class = "Stream-container"></div>
-     
+
     <script>
-         function CameraCount (count){
-            const conatiner= document.querySelector(".Stream-container");
-            container.innerHTML ="";
-            switch (count){
-                case 1:
-                addCamera (0);
-                break;
-                case 2:
-                addCamera (0);
-                addCmaera (1);
-                break;
-                case 3:
-                addCamera (0);
-                addCamera (1);
-                addCamera (2);
-                break;
-                case 4: 
-                addCamera(0);
-                addCamera(1);
-                addCamera(2);
-                addCamera(3);
-                break;
-                default:
-                    console.log("Invalid Selection");
-            }
-}
-function addCamera(index){
-
-
         const streams = [
             "http://192.168.0.100:8080/stream",
             "http://192.168.0.100:8081/stream",
             "http://192.168.0.100:8082/stream",
             "http://192.168.0.100:8083/stream"
         ];
-        const conatiner = document.querySelector(".Stream_container");
-        const videoElement = document.createElement("video");
-        videoElement.src = streams[index];
-        videoElement.autoplay = true;
-        videoElement.controls= true;
-        videoElement.style.width = "48%";
-        conatiner.appendChild(videoElement);
-}
+
+        function toggleCameraDropdown() {
+            const dropdown = document.getElementById("cameraDropdownMenu");
+            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+        }
+
+        function updateCameras() {
+            const streamContainer = document.getElementById("streamContainer");
+            streamContainer.innerHTML = ""; // Clear existing streams
+
+            const selectedCameras = [];
+            for (let i = 0; i < 4; i++) {
+                const checkbox = document.getElementById(`camera${i+1}`);
+                if (checkbox.checked) {
+                    selectedCameras.push(i);
+                }
+            }
+
+            // Add selected cameras
+            selectedCameras.forEach(index => {
+                const videoElement = document.createElement("video");
+                videoElement.src = streams[index];
+                videoElement.autoplay = true;
+                videoElement.controls = true;
+                videoElement.style.width = selectedCameras.length > 1 ? "48%" : "100%";
+                streamContainer.appendChild(videoElement);
+            });
+        }
+
+        // Close dropdowns only when clicking outside the dropdown
+        window.onclick = function(event) {
+            const dropdownButton = document.querySelector('.dropdown button');
+            const dropdownContent = document.getElementById("cameraDropdownMenu");
+            
+            if (!dropdownButton.contains(event.target) && 
+                !dropdownContent.contains(event.target)) {
+                dropdownContent.style.display = "none";
+            }
+        }
     </script>
 </body>
 </html>
-
