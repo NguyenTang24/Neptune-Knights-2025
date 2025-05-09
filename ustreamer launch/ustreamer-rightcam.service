@@ -1,0 +1,15 @@
+[Unit]
+Description=uStreamer Right Camera Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/ustreamer --device=/dev/rightcam --host=$(hostname -I | awk '{print $1}') --port=8084
+Restart=always
+User=%i
+WorkingDirectory=/home/%i
+StandardOutput=append:/var/log/ustreamer-rightcam.log
+StandardError=append:/var/log/ustreamer-rightcam.log
+
+[Install]
+WantedBy=multi-user.target
