@@ -4,7 +4,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=ustreamer --device=/dev/frontcam --host=$(hostname -I | awk '{print $1}') --port=8082
+ExecStart=ustreamer --device=/dev/frontcam --host=192.168.0.100 --port=8082
 Restart=always
 User=%i
 WorkingDirectory=/home/%i
