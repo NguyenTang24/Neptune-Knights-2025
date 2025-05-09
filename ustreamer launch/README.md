@@ -29,17 +29,12 @@ sudo udevadm control --reload-rules
 sudo udevadm trigger
 ```
 
-### 5. Move ustreamer.service into systemd
+### 6. Install services:
 ```bash
-sudo cp ustreamer.service /etc/systemd/system/
+chmod +x install-ustreamer.sh
+sudo ./install-ustreamer.sh
 ```
-
-### 6. Enable and Start the uStreamer Service
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable ustreamer
-sudo systemctl start ustreamer
-```
+Enter username when prompted. This will install, enable, and start 4 service files for the cameras.
 
 ## Viewing the Streams
 Once the service is running, access your camera streams at:
@@ -77,9 +72,7 @@ udevadm info -a -n /dev/video0 | grep KERNELS
 ## Uninstalling
 To remove the setup:
 ```bash
-sudo systemctl stop ustreamer
-sudo systemctl disable ustreamer
-sudo rm /etc/systemd/system/ustreamer.service
+sudo rm /etc/systemd/system/ustreamer-*
 sudo rm /etc/udev/rules.d/99-usb-cameras.rules
 sudo udevadm control --reload-rules
 ```
