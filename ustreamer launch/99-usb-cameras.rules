@@ -1,4 +1,4 @@
-SUBSYSTEM=="video4linux", KERNELS=="1-1", SYMLINK+="frontcam"
+SUBSYSTEM=="video4linux", ATTRS{serial}=="YL20230518V0", SYMLINK+="frontcam"
 SUBSYSTEM=="video4linux", KERNELS=="3-1.2", SYMLINK+="leftcam"
 SUBSYSTEM=="video4linux", KERNELS=="3-1.2", SYMLINK+="rightcam"
 SUBSYSTEM=="video4linux", KERNELS=="3-1.4", SYMLINK+="tethercam"
