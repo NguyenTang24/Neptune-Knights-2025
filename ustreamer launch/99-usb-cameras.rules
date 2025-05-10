@@ -1,5 +1,5 @@
-SUBSYSTEM=="video4linux", KERNELS=="1-1:1.0", SYMLINK+="frontcam"
-SUBSYSTEM=="video4linux", KERNELS=="3-1.2:1.0", SYMLINK+="leftcam"
-SUBSYSTEM=="video4linux", KERNELS=="3-1.2:1.0", SYMLINK+="rightcam"
-SUBSYSTEM=="video4linux", KERNELS=="3-1.4:1.0", SYMLINK+="tethercam"
+SUBSYSTEM=="video4linux", KERNELS=="1-1", SYMLINK+="frontcam"
+SUBSYSTEM=="video4linux", KERNELS=="3-1.2", SYMLINK+="leftcam"
+SUBSYSTEM=="video4linux", KERNELS=="3-1.2", SYMLINK+="rightcam"
+SUBSYSTEM=="video4linux", KERNELS=="3-1.4", SYMLINK+="tethercam"
 
