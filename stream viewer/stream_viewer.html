@@ -10,24 +10,22 @@
       margin: 0;
       padding: 0;
     }
-
-    .header {
+    .header1 {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       background-color: #f1f1f1;
-      padding: 10px;
+      padding: 3px;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       z-index: 1000;
     }
-
     .dropdown {
       position: relative;
       margin-right: 20px;
     }
-
     .dropdown-content {
       display: none;
       position: absolute;
@@ -38,42 +36,45 @@
       top: 100%;
       padding: 10px;
     }
-
     .dropdown-content label {
       display: block;
       margin: 5px 0;
     }
-
     .dropdown-content input {
       margin-right: 10px;
     }
-
     .stream-container {
+      width: 100vw;
       display: flex;
+      margin-top: 70px;
+      flex: 1;
       flex-wrap: wrap;
       justify-content: center;
       gap: 10px;
-      padding: 60px 10px 10px;
+      align-items: center;
     }
-
     .video-wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-bottom: 20px;
-      position: relative;
-      padding: 10px;
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
+      height: 100%;
     }
-
+    .video-label {
+      font-size: 0.9em;
+      margin-top: 5px;
+      color: #333;
+      text-align: center;
+    }
     .video-box {
       width: 100%;
-      padding-top: 100%; /* Makes the box square */
+      padding-top: 100%;
       position: relative;
       overflow: hidden;
       background: black;
     }
-
     .video-box video {
       position: absolute;
       top: 50%;
@@ -85,7 +86,6 @@
       object-fit: cover;
       pointer-events: none;
     }
-
     .resizer {
       position: absolute;
       width: 15px;
@@ -97,41 +97,45 @@
       cursor: nwse-resize;
       z-index: 10;
     }
-
     .controls {
       margin-top: 8px;
     }
-
     button {
       margin: 0 5px;
-      padding: 4px 8px;
+      
     }
   </style>
 </head>
 <body>
   <h1 style="text-align: center; padding-top: 60px;">Camera Stream Viewer</h1>
-  <div class="header">
+  <div class="header1">
     <div class="dropdown">
       <button onclick="toggleCameraDropdown()">Select Cameras</button>
       <div id="cameraDropdownMenu" class="dropdown-content">
-        <label><input type="checkbox" id="camera1" value="0" onchange="updateCameras()">Camera 1</label>
-        <label><input type="checkbox" id="camera2" value="1" onchange="updateCameras()">Camera 2</label>
-        <label><input type="checkbox" id="camera3" value="2" onchange="updateCameras()">Camera 3</label>
-        <label><input type="checkbox" id="camera4" value="3" onchange="updateCameras()">Camera 4</label>
+        <label><input type="checkbox" id="camera1" value="0" onchange="updateCameraSelection(0)">Camera 1</label>
+        <label><input type="checkbox" id="camera2" value="1" onchange="updateCameraSelection(1)">Camera 2</label>
+        <label><input type="checkbox" id="camera3" value="2" onchange="updateCameraSelection(2)">Camera 3</label>
+        <label><input type="checkbox" id="camera4" value="3" onchange="updateCameraSelection(3)">Camera 4</label>
+      </div>
+    </div>
+    <div class="dropdown">
+      <button onclick="toggleLayoutDropdown()">Select Layout</button>
+      <div id="layoutDropdownMenu" class="dropdown-content">
+        <label><input type="radio" id="layout2" name="layout" value="1" onchange="updateLayout()">Layout 2A</label>
+        <label><input type="radio" id="layout3" name="layout" value="2" onchange="updateLayout()">Layout 2B</label>
+       
       </div>
     </div>
   </div>
 
-  <div class="stream-container" id="streamContainer">
-    <!-- Cameras will be dynamically added here -->
-  </div>
+  <div class="stream-container" id="streamContainer"></div>
 
   <script>
     const streams = [
-      "http://192.168.0.100:8080/stream",
-      "http://192.168.0.100:8081/stream",
       "http://192.168.0.100:8082/stream",
-      "http://192.168.0.100:8083/stream"
+      "http://192.168.0.100:8083/stream",
+      "http://192.168.0.100:8084/stream",
+      "http://192.168.0.100:8085/stream"
     ];
 
     const cameraSettings = {
@@ -141,27 +145,95 @@
       3: { rotation: 0, scale: 1 }
     };
 
+    const layoutModes = {
+      0: "1",
+      1: "2A",
+      2: "2B",
+      3: "3",
+      4: "4"
+    };
+
+    let currentLayout = "1";
+    let cameraOrder = [];
+
     function toggleCameraDropdown() {
       const dropdown = document.getElementById("cameraDropdownMenu");
       dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
     }
 
-    function updateCameras() {
-      const streamContainer = document.getElementById("streamContainer");
-      streamContainer.innerHTML = ""; // Clear existing streams
+    function toggleLayoutDropdown() {
+      const dropdown = document.getElementById("layoutDropdownMenu");
+      dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+    }
 
-      const selectedCameras = [];
-      for (let i = 0; i < 4; i++) {
-        const checkbox = document.getElementById(`camera${i + 1}`);
-        if (checkbox.checked) {
-          selectedCameras.push(i);
+    function updateCameraSelection(index) {
+      const checkbox = document.getElementById(`camera${index + 1}`);
+      if (checkbox.checked) {
+        if (!cameraOrder.includes(index)) {
+          cameraOrder.push(index);
+        }
+      } else {
+        cameraOrder = cameraOrder.filter(i => i !== index);
+      }
+      updateCameras();
+    }
+
+    function updateLayout() {
+      let selectedLayout = null;
+      for (let i = 0; i < 5; i++) {
+        const radio = document.getElementById(`layout${i + 1}`);
+        if (radio && radio.checked) {
+          selectedLayout = i;
+          break;
         }
       }
+      currentLayout = layoutModes[selectedLayout];
+      updateCameras();
+    }
 
-      selectedCameras.forEach(index => {
-        const wrapper = document.createElement("div");
-        wrapper.className = "video-wrapper";
-        wrapper.style.width = selectedCameras.length > 1 ? "48%" : "100%";
+    function updateCameras() {
+      const streamContainer = document.getElementById("streamContainer");
+      streamContainer.innerHTML = "";
+      streamContainer.style.display = "";
+      streamContainer.style.flexDirection = "";
+      streamContainer.style.gridTemplateColumns = "";
+      streamContainer.style.gridTemplateRows = "";
+      streamContainer.style.gap = "";
+
+      const camCount = cameraOrder.length;
+      if (camCount === 1) currentLayout = "1";
+      else if (camCount === 2 && currentLayout !== "2A" && currentLayout !== "2B") currentLayout = "2A";
+      else if (camCount === 3) currentLayout = "3";
+      else if (camCount === 4) currentLayout = "4";
+
+      if (currentLayout === "1") {
+        streamContainer.style.display = "flex";
+      } else if (currentLayout === "2A") {
+        streamContainer.style.display = "flex";
+        streamContainer.style.flexDirection = "row";
+      } else if (currentLayout === "2B") {
+        streamContainer.style.display = "flex";
+        streamContainer.style.flexDirection = "column";
+      } else if (currentLayout === "3") {
+        streamContainer.style.display = "grid";
+        streamContainer.style.gridTemplateColumns = "2fr 1fr";
+        streamContainer.style.gridTemplateRows = "1fr 1fr";
+        streamContainer.style.gap = "10px";
+      } else if (currentLayout === "4") {
+        streamContainer.style.display = "grid";
+        streamContainer.style.gridTemplateColumns = "1fr 1fr";
+        streamContainer.style.gridTemplateRows = "1fr 1fr";
+        streamContainer.style.gap = "10px";
+      }
+
+      cameraOrder.forEach((index, i) => {
+        const camera_wrapper = document.createElement("div");
+        camera_wrapper.className = "video-wrapper";
+        if (currentLayout === "3" || currentLayout === "4") {
+          camera_wrapper.style.width = "100%";
+        } else {
+          camera_wrapper.style.width = cameraOrder.length > 1 ? "48%" : "100%";
+        }
 
         const videoBox = document.createElement("div");
         videoBox.className = "video-box";
@@ -178,7 +250,6 @@
         const resizer = document.createElement("div");
         resizer.className = "resizer";
         videoBox.appendChild(resizer);
-
         makeResizable(videoBox, index);
 
         const controls = document.createElement("div");
@@ -188,9 +259,25 @@
           <button onclick="rotateCamera(${index}, 90)">⟳</button>
         `;
 
-        wrapper.appendChild(videoBox);
-        wrapper.appendChild(controls);
-        streamContainer.appendChild(wrapper);
+        const label = document.createElement("div");
+        label.className = "video-label";
+        label.textContent = `Camera ${index + 1}`;
+
+        if (camCount === 3 && currentLayout === "3") {
+          camera_wrapper.style.position = "relative";
+          if (i === 0) {
+            camera_wrapper.style.gridRow = "1 / span 2";
+            camera_wrapper.style.gridColumn = "1";
+          } else {
+            camera_wrapper.style.gridColumn = "2";
+            camera_wrapper.style.gridRow = i === 1 ? "1" : "2";
+          }
+        }
+
+        camera_wrapper.appendChild(videoBox);
+        camera_wrapper.appendChild(label);
+        camera_wrapper.appendChild(controls);
+        streamContainer.appendChild(camera_wrapper);
       });
     }
 
@@ -227,7 +314,6 @@
       });
     }
 
-    // Close dropdown when clicking outside
     window.onclick = function(event) {
       const dropdownButton = document.querySelector('.dropdown button');
       const dropdownContent = document.getElementById("cameraDropdownMenu");
