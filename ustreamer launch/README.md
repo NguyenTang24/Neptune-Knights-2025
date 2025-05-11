@@ -1,60 +1,80 @@
-# uStreamer Auto-Start with Persistent Camera Naming  
+# uStreamer Multi-Camera Setup
 
-This script automates the setup of **persistent camera names** and ensures `uStreamer` starts automatically on boot.  
-✅ Automatically detects cameras and assigns them permanent names
-✅ Ensures consistent camera mapping across reboots
-✅ Streams each camera on a unique port
-✅ Auto-restarts streams if they fail
-✅ Works for any number of cameras
+## Overview
+This setup enables persistent USB camera names using `udev` rules and launches multiple `ustreamer` instances automatically on startup.
 
-## Installation  
-
-Run the following commands on your Raspberry Pi:  
+## Installation
+### 1. Clone the Repository
 ```bash
-git clone https://github.com/Neptune-Knights/Neptune-Knights-2025
-cd "Neptune-Knights-2025/ustreamer launch" 
-chmod +x install.sh
-./install.sh
+git clone <your-repo-url>
+cd <your-repo-name>
 ```
 
-During setup, you will be asked to name each camera. For example:
+### 2. Install Dependencies
 ```bash
-Detected camera: /dev/video0
-Enter a custom name for this camera (e.g., 'cam_front', 'cam_rear'): cam_front
+sudo apt update
+sudo apt install -y v4l-utils ustreamer
 ```
 
-# How to Acces Camera Streams:
-After installation, they will be available at:
-- http://pi-ip:8080 -> /dev/cam_front
-- http://pi-ip:8081 -> /dev/cam_rear (etc.)
-
-# Managing Camera Streams:
-## Check Running Services:
+### 3. Move the udev Rules File
+Move the provided udev rules file into the correct directory:
 ```bash
-systemctl list-units --type=service | grep ustreamer
-```
-Restart a Camera Stream:
-```bash
-sudo systemctl restart ustreamer_cam_front
-```
-Stop a Camera Stream:
-```bash
-sudo systemctl stop ustreamer_cam_rear
-```
-Disable a Camera from AutoStarting:
-```bash
-sudo systemctl disable ustreamer_cam_side
+sudo cp 99-usb-cameras.rules /etc/udev/rules.d/
 ```
 
-# Uninstalling & Removing Persistent Names:
-If you want to remove the uStreamer service and persistent camera names, run:
+### 4. Apply the udev Rules
+The udev rules are based on the physical port number. It is important that the cameras remain plugged into the same USB port.
 ```bash
-sudo systemctl stop ustreamer_*
-sudo systemctl disable ustreamer_*
-sudo rm /etc/systemd/system/ustreamer_*.service
-sudo rm /etc/udev/rules.d/99-usb-cameras.rules
-sudo systemctl daemon-reload
 sudo udevadm control --reload-rules
 sudo udevadm trigger
 ```
+
+### 6. Install services:
+```bash
+chmod +x install-ustreamer.sh
+sudo ./install-ustreamer.sh
+```
+Enter username when prompted. This will install, enable, and start 4 service files for the cameras.
+
+## Viewing the Streams
+Once the service is running, access your camera streams at:
+- `http://<Pi_IP>:8082` (Front Camera)
+- `http://<Pi_IP>:8083` (Left Camera)
+- `http://<Pi_IP>:8084` (Right Camera)
+- `http://<Pi_IP>:8085` (Tether Camera)
+
+## Checking Logs
+To check if the service is running correctly, use:
+```bash
+journalctl -u ustreamer -f
+```
+
+## Troubleshooting
+- If a camera is not appearing at `/dev/frontcam`, `/dev/leftcam`, etc., check with:
+  ```bash
+  ls -l /dev/frontcam
+  ```
+- Verify that the udev rules are correct:
+  ```bash
+  udevadm info -q property -n /dev/videoX
+  ```
+- Restart the service:
+  ```bash
+  sudo systemctl restart ustreamer
+  ```
+
+## Updating udev rules:
+How to find port number of each camera:
+```bash
+udevadm info -a -n /dev/video0 | grep KERNELS
+```
+
+## Uninstalling
+To remove the setup:
+```bash
+sudo rm /etc/systemd/system/ustreamer-*
+sudo rm /etc/udev/rules.d/99-usb-cameras.rules
+sudo udevadm control --reload-rules
+```
+
 

@@ -1,0 +1,15 @@
+[Unit]
+Description=uStreamer Tether Camera Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=ustreamer --device=/dev/tethercam --host=192.168.0.100 --port=8085
+Restart=always
+User=%i
+WorkingDirectory=/home/%i
+StandardOutput=append:/var/log/ustreamer-tethercam.log
+StandardError=append:/var/log/ustreamer-tethercam.log
+
+[Install]
+WantedBy=multi-user.target

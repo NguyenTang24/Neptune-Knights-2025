@@ -1,0 +1,15 @@
+[Unit]
+Description=uStreamer Left Camera Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=ustreamer --device=/dev/leftcam --host=192.168.0.100 --port=8083
+Restart=always
+User=%i
+WorkingDirectory=/home/%i
+StandardOutput=append:/var/log/ustreamer-leftcam.log
+StandardError=append:/var/log/ustreamer-leftcam.log
+
+[Install]
+WantedBy=multi-user.target

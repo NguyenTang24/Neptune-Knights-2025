@@ -1,0 +1,15 @@
+[Unit]
+Description=uStreamer Front Camera Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=ustreamer --device=/dev/frontcam --host=192.168.0.100 --port=8082
+Restart=always
+User=%i
+WorkingDirectory=/home/%i
+StandardOutput=append:/var/log/ustreamer-frontcam.log
+StandardError=append:/var/log/ustreamer-frontcam.log
+
+[Install]
+WantedBy=multi-user.target

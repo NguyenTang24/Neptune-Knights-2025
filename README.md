@@ -29,6 +29,12 @@ cd src
 git submodule update --init --recursive
 ```
 
+It is also recommended that you copy the contents of INFO/.bashrc into your .bashrc file or source the file.
+Also, copy the contents of INFO/hosts into your /etc/hosts file:
+```bash
+sudo cat INFO/hosts >> /etc/hosts
+```
+
 ## ROV Software (BlueOS, ArduPilot, and scripts):
 
 BlueOS is the companion software to ArduPilot. It runs on the Raspberry Pi and can be accessed via the web browser on the control station on the same network. See below for how to install ArduPilot onto the flight controller from within BlueOS. 
@@ -42,14 +48,7 @@ See the ArduPilot repo for how to compile the team's custom version of ArduSub.
 Once a .apj file is compiled, it can be uploaded from within BlueOS. 
  
 ### [Cameras](https://github.com/Neptune-Knights/Neptune-Knights-2025/tree/main/ustreamer%20launch):
-This installs a service on the Pi to launch an http stream of the cameras. It is currently set up for only one camera stream.
-On the Pi:
-```bash
-git clone https://github.com/Neptune-Knights/Neptune-Knights-2025/ustreamer-service
-cd ustreamer-service
-chmod +x ustreamer.service
-./install.sh
-```
+This setup launches four camera streams on the Pi using the ustreamer package.
  
 ## Control Station Setup:
 The control station runs on the latest version of Ubuntu 24.10, though any modern Linux distro should work. Once Ubuntu and Google Chrome are installed, additional scripts/software can be used as follows.
@@ -68,7 +67,7 @@ Currently, the network is centered around a router in the control station. Any r
 For our team, the following static IPs are used:
 - Router: 192.168.0.1
 - Control Station (hostname neptune): 192.168.0.101
-- ROV (Raspberry Pi (hostname blueos)): 192.168.0.100
+- ROV (Raspberry Pi (hostname blueos, username pi)): 192.168.0.100
 
 
 ## Float:
